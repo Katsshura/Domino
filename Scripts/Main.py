@@ -61,7 +61,7 @@ class KeyDisplay(cocos.layer.Layer):
         text = 'Keys: ' + ','.join(key_names)
         # Update self.text
         self.text.element.text = text
-        
+
 cocos.director.director.init()
 cocos.director.director.run(cocos.scene.Scene(KeyDisplay()))
 
