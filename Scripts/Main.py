@@ -2,6 +2,7 @@ import cocos
 import pyglet
 from cocos.actions import *
 from cocos.scene import *
+
 class HelloWorld(cocos.layer.ColorLayer):
     def __init__(self):
         super(HelloWorld, self).__init__(64,645,255,255)

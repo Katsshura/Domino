@@ -1,4 +1,4 @@
-from peca_domino import *
+from peca import *
 
 class Domino_struct:
     def __int__(self):
