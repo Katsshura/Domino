@@ -4,12 +4,22 @@ from cocos.actions import *
 import sys,os
 from cocos.scene import *
 
+#Those classes are just for tests
+
 class HelloWorldImage(cocos.layer.Layer):
     def __init__(self):
         super(HelloWorldImage, self).__init__()
         sprite = cocos.sprite.Sprite('background.png')
         sprite.position = 1280 // 2, 720 // 2
         self.add(sprite)
+        sprite2 = cocos.sprite.Sprite('peca01.png')
+        sprite2.position = (1280//2), (720//2)-300
+        sprite2.scale = 0.45
+        self.add(sprite2)
+        sprite3 = cocos.sprite.Sprite('peca02.png')
+        sprite3.position = (1280//2)+50, (720//2)-300
+        sprite3.scale = 0.45
+        self.add(sprite3)
         text = cocos.text.Label("Domino Game", font_name = "Times New Roman", font_size = 32, anchor_x = "center", anchor_y = "center")
         text.position = 1280//2, 720//2
         self.add(text)
