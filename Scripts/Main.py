@@ -1,15 +1,19 @@
 import cocos
 import pyglet
 from cocos.actions import *
+import sys,os
 from cocos.scene import *
 
-class HelloWorld(cocos.layer.ColorLayer):
+class HelloWorldImage(cocos.layer.Layer):
     def __init__(self):
-        super(HelloWorld, self).__init__(64,645,255,255)
-        text = cocos.text.Label("Domino Game", font_name = "Times New Roman", font_size = 32, anchor_x="center", anchor_y = "center")
-        text.position = 320, 340
+        super(HelloWorldImage, self).__init__()
+        sprite = cocos.sprite.Sprite('background.png')
+        sprite.position = 1280 // 2, 720 // 2
+        self.add(sprite)
+        text = cocos.text.Label("Domino Game", font_name = "Times New Roman", font_size = 32, anchor_x = "center", anchor_y = "center")
+        text.position = 1280//2, 720//2
         self.add(text)
-        sub_text = cocos.text.Label("A game made by: Emerson Alves", font_name = "Times New Roman", font_size = 24, anchor_x="center", anchor_y = "center")
+        sub_text = cocos.text.Label("A game made by: Emerson Alves", font_name = "Times New Roman", font_size = 24, anchor_x = "center", anchor_y = "center")
         sub_text.position = 320, 240
         self.add(sub_text)
         scale = ScaleBy(2, duration=2)
@@ -63,7 +67,6 @@ class KeyDisplay(cocos.layer.Layer):
         # Update self.text
         self.text.element.text = text
 
-cocos.director.director.init()
-cocos.director.director.run(cocos.scene.Scene(KeyDisplay()))
-
+cocos.director.director.init( width=1280, height=720)
+cocos.director.director.run(cocos.scene.Scene(HelloWorldImage()))
 
