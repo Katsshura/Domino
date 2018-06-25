@@ -63,7 +63,7 @@ class KeyDisplay(cocos.layer.Layer):
         # Update self.text
         self.text.element.text = text
 
-cocos.director.director.init()
+cocos.director.director.init( width=1280, height=720)
 cocos.director.director.run(cocos.scene.Scene(KeyDisplay()))
 
 
