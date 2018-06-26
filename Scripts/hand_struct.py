@@ -31,6 +31,16 @@ class Hand_struct:
                 pos += 1
             return atual
 
+    def hand_sprites(self):
+        sprites = []
+        atual = self._head
+
+        while atual != None:
+            sprites.append(atual.sprite())
+            atual = atual.getNext()
+
+        return sprites
+
     def remove(self, index):
         atual = self._head
         pos = 0

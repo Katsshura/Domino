@@ -3,6 +3,7 @@ class Peca_Domino:
         self._proximo = None
         self._anterior = None
         self._value = [top, bottom]
+        self._sprite = None
 
     def getNext(self):
         return self._proximo
@@ -14,6 +15,10 @@ class Peca_Domino:
         self._proximo = next
     def setPrevious(self, prev):
         self._anterior = prev
+    def setSprite(self, sprite):
+        self._sprite = sprite
+    def sprite(self):
+        return self._sprite
     def __str__(self):
         return str(self._value)
 
