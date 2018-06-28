@@ -24,7 +24,7 @@ class Hand_struct:
         atual = self._head
         pos = 0
         if index > self._tam-1:
-            return False
+            return None
         else:
             while pos != index:
                 atual = atual.getNext()

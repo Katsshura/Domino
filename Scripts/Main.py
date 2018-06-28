@@ -9,6 +9,9 @@ from random import randint
 from hand_struct import *
 
 #Those classes are just for tests
+
+#42x83 each
+
 class Background(cocos.layer.Layer):
     def __init__(self):
         super(Background, self).__init__()
@@ -17,7 +20,7 @@ class Background(cocos.layer.Layer):
         background.position = 1280 // 2, 720 // 2
         self.add(background)
 
-class Main(cocos.layer.Layer()):
+class Main(cocos.layer.Layer):
     is_event_handler = True
 
     def __init__(self):
@@ -27,51 +30,56 @@ class Main(cocos.layer.Layer()):
         self._pool.start()
         self.start_hand()
         self._h_sprites = self._hand.hand_sprites()
+        self._pieceIndex = None
+        self._isPieceSelected = False
 
         self.set_sprites()
 
-        self._text = cocos.text.Label("", font_name="Times New Roman", font_size=32, anchor_x="center", anchor_y="center")
-        self._text.position = 1280 // 2, 720 // 2
-        self.add(self._text)
-
     def set_sprites(self):
-        pos_x = -150
+        pos_x = -125
         for i in range(7):
             sprite = self._h_sprites[i]
-            sprite.position = (1280//2)+pos_x, (720//2)-300
+            sprite.anchor = sprite.get_rect().bottomleft
+            sprite.position = (1280//2) + pos_x, (720//2)-250
             sprite.scale = 0.45
             self.add(sprite)
             pos_x += 50
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        self._text.element.text = "Draging"
+        if self._isPieceSelected:
+            self._h_sprites[self._pieceIndex].position = x+31, y+51
+
 
     def on_mouse_release(self, x, y, buttons, modifiers):
-        self._text.element.text = "Released"
+        self._isPieceSelected = False
 
     def on_mouse_press(self, x, y, buttons, modifiers):
-        self._text.element.text = 'Pressed'
+        print(x,y)
+
+        if self.check_click(x,y):
+            print(True, self._hand.search(self._pieceIndex))
+            self._isPieceSelected = True
+        else:
+            self._isPieceSelected = False
+            print(False)
+
+    def check_click(self,x,y):
+        check = False
+        pos = 0
+        while pos < len(self._h_sprites) and not check:
+            if self._h_sprites[pos].get_rect().contains(x,y):
+                check = True
+                self._pieceIndex = pos
+            else:
+                pos += 1
+
+        return check
+
 
     def start_hand(self):
         for i in range(7):
             self._hand.insert(self._pool.sort_peca())
-        '''sprite2 = cocos.sprite.Sprite('peca01.png')
-        sprite2.position = (1280//2), (720//2)-300
-        sprite2.scale = 0.45
-        self.add(sprite2)
-        sprite3 = cocos.sprite.Sprite('peca02.png')
-        sprite3.position = (1280//2)+50, (720//2)-300
-        sprite3.scale = 0.45
-        self.add(sprite3)
-        text = cocos.text.Label("Domino Game", font_name = "Times New Roman", font_size = 32, anchor_x = "center", anchor_y = "center")
-        text.position = 1280//2, 720//2
-        self.add(text)
-        sub_text = cocos.text.Label("A game made by: Emerson Alves", font_name = "Times New Roman", font_size = 24, anchor_x = "center", anchor_y = "center")
-        sub_text.position = 320, 240
-        self.add(sub_text)
-        scale = ScaleBy(2, duration=2)
-        text.do(Repeat(scale + Reverse(scale)))
-        sub_text.do(Repeat(Reverse(scale) + scale))'''
+
 
 cocos.director.director.init( width=1280, height=720)
 cocos.director.director.run(cocos.scene.Scene(Background(),Main()))
