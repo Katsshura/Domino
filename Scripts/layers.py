@@ -58,6 +58,7 @@ class Main(cocos.layer.Layer):
             else:
                 if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
                     self._h_sprites[self._pieceIndex].position = 1280//2, 720//2
+                    self.throw_piece()
                 else:
                     self._h_sprites[self._pieceIndex].position = self._lastPosition
         else:
@@ -87,19 +88,30 @@ class Main(cocos.layer.Layer):
 
     def check_highest_piece(self):
         highest = 0
+        aux = -1
         pos = 0
-
         for i in range(self._hand.len()):
             peca = self._hand.search(i)
             peca_value = peca.getValue()[0] + peca.getValue()[1]
             if peca_value > highest:
                 highest = peca_value
+                aux += 1
+                pos = aux
             else:
-                pos += 1
+                aux += 1
+        print(pos, aux)
         return pos
 
 
     def start_hand(self):
         for i in range(7):
             self._hand.insert(self._pool.sort_peca())
+
+    def throw_piece(self):
+        peca = self._hand.remove(self._pieceIndex)
+        peca.setPrevious(None)
+        peca.setNext(None)
+        self._domino.insert(peca, 0)
+        print(self._domino.show())
+        print(self._hand.show())
 
