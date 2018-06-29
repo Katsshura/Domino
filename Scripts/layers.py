@@ -2,9 +2,9 @@ import cocos
 import pyglet
 from cocos.actions import *
 from cocos.scene import *
-from pool_struct import *
-from hand_struct import *
-from domino_struct import *
+from Scripts.pool_struct import *
+from Scripts.hand_struct import *
+from Scripts.domino_struct import *
 
 #42x83 each
 
@@ -24,7 +24,6 @@ class Main(cocos.layer.Layer):
         self._pool = Pool()
         self._hand = Hand_struct()
         self._domino = Domino_struct()
-        self._pool.start()
         self.start_hand()
         self._h_sprites = self._hand.hand_sprites()
         self._pieceIndex = None
@@ -93,13 +92,14 @@ class Main(cocos.layer.Layer):
         for i in range(self._hand.len()):
             peca = self._hand.search(i)
             peca_value = peca.getValue()[0] + peca.getValue()[1]
+            if(peca.getValue()[0] == peca.getValue()[1] and self._domino.len() == 0):
+                peca_value += 20
             if peca_value > highest:
                 highest = peca_value
                 aux += 1
                 pos = aux
             else:
                 aux += 1
-        print(pos, aux)
         return pos
 
 
@@ -112,6 +112,3 @@ class Main(cocos.layer.Layer):
         peca.setPrevious(None)
         peca.setNext(None)
         self._domino.insert(peca, 0)
-        print(self._domino.show())
-        print(self._hand.show())
-
