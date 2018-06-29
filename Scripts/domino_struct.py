@@ -96,21 +96,3 @@ class Domino_struct:
         l += "]"
 
         return l
-
-
-peca1 = Peca_Domino(0,3)
-peca2 = Peca_Domino(2,3)
-peca3 = Peca_Domino(1,4)
-peca4 = Peca_Domino(1,5)
-peca5 = Peca_Domino(6,6)
-peca6 = Peca_Domino(2,2)
-f = Domino_struct()
-
-f.append(peca1)
-f.append(peca2)
-f.append(peca3)
-f.append(peca4)
-f.append(peca5)
-print(f.show())
-f.insert(peca6,1)
-print(f.show())
