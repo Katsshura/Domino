@@ -56,7 +56,10 @@ class Main(cocos.layer.Layer):
                  elif self._h_sprites[self._pieceIndex].x < 640: #olha pra esquerda
                     pass
             else:
-                print("oi")
+                if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
+                    self._h_sprites[self._pieceIndex].position = 1280//2, 720//2
+                else:
+                    self._h_sprites[self._pieceIndex].position = self._lastPosition
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
 
