@@ -93,13 +93,14 @@ class Main(cocos.layer.Layer):
         for i in range(self._hand.len()):
             peca = self._hand.search(i)
             peca_value = peca.getValue()[0] + peca.getValue()[1]
+            if(peca.getValue()[0] == peca.getValue()[1] and self._domino.len() == 0):
+                peca_value += 20
             if peca_value > highest:
                 highest = peca_value
                 aux += 1
                 pos = aux
             else:
                 aux += 1
-        print(pos, aux)
         return pos
 
 
@@ -112,6 +113,3 @@ class Main(cocos.layer.Layer):
         peca.setPrevious(None)
         peca.setNext(None)
         self._domino.insert(peca, 0)
-        print(self._domino.show())
-        print(self._hand.show())
-
