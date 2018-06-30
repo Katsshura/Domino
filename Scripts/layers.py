@@ -2,9 +2,9 @@ import cocos
 import pyglet
 from cocos.actions import *
 from cocos.scene import *
-from Scripts.pool_struct import *
-from Scripts.hand_struct import *
-from Scripts.domino_struct import *
+from pool_struct import *
+from hand_struct import *
+from domino_struct import *
 
 #42x83 each
 
@@ -51,9 +51,9 @@ class Main(cocos.layer.Layer):
         if self._h_sprites[self._pieceIndex].y > 720//4:
             if self._domino.len() != 0:
                  if self._h_sprites[self._pieceIndex].x > 640: #olha pra direita
-                    pass
+                    self.check_tail()
                  elif self._h_sprites[self._pieceIndex].x < 640: #olha pra esquerda
-                    pass
+                    self.check_head()
             else:
                 if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
                     self._h_sprites[self._pieceIndex].position = 1280//2, 720//2
@@ -82,7 +82,14 @@ class Main(cocos.layer.Layer):
                 pos += 1
         return check
 
-    def check_values(self):
+    def check_head(self):
+        #value for head is on index 0
+        if (self._domino.head().getValue()[0] == self._hand.search(self._pieceIndex).getValue()[0]):
+            print("sim", self._hand.search(self._pieceIndex).getValue()[0])
+        else:
+            print("nao", self._hand.search(self._pieceIndex).getValue())
+
+    def check_tail(self):
         pass
 
     def check_highest_piece(self):

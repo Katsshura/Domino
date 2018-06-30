@@ -1,4 +1,4 @@
-from Scripts.peca import *
+from peca import *
 from random import randint
 import cocos
 
@@ -14,7 +14,6 @@ class Pool:
             while x != 7:
                 y = x
                 while y != 7:
-                    print("x: {} y: {}".format(x, y))
                     self._peca = Peca_Domino(x, y)
                     self._peca.setSprite(cocos.sprite.Sprite("peca" + str(i) + ".png"))
                     self._pool.append(self._peca)

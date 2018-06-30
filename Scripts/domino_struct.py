@@ -83,6 +83,12 @@ class Domino_struct:
     def len(self):
         return self._tam
 
+    def head(self):
+        return self._head
+
+    def tail(self):
+        return self._tail
+
     def show(self):
         atual = self._head
         l = "["
