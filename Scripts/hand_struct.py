@@ -56,6 +56,7 @@ class Hand_struct:
                 temp.setPrevious(None)
                 peca = self._head
                 self._head = temp
+                self._tam -= 1
                 return peca
 
             if pos == self.len() -1:
@@ -63,12 +64,14 @@ class Hand_struct:
                 tem.setNext(None)
                 peca = self._tail
                 self._tail = tem
+                self._tam -= 1
                 return peca
             else:
                 next = atual.getNext()
                 previous = atual.getPrevious()
                 previous.setNext(next)
                 next.setPrevious(previous)
+                self._tam -= 1
                 return atual
 
 

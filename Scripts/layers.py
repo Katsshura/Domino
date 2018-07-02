@@ -29,6 +29,7 @@ class Main(cocos.layer.Layer):
         self._pieceIndex = None
         self._isPieceSelected = False
         self._lastPosition = None
+        print(self._hand.len(), self._h_sprites.__len__(),self._domino.len())
 
         self.set_sprites()
 
@@ -83,6 +84,7 @@ class Main(cocos.layer.Layer):
         return check
 
     def check_head(self):
+        print(self._hand.len(), self._h_sprites.__len__(), self._domino.len())
         #value for head is on index 0
         if (self._domino.head().getValue()[0] == self._hand.search(self._pieceIndex).getValue()[0]):
             print("sim", self._hand.search(self._pieceIndex).getValue()[0])
@@ -90,7 +92,7 @@ class Main(cocos.layer.Layer):
             print("nao", self._hand.search(self._pieceIndex).getValue())
 
     def check_tail(self):
-        pass
+        print(self._hand.len(), self._h_sprites.__len__(), self._domino.len())
 
     def check_highest_piece(self):
         highest = 0
@@ -116,6 +118,7 @@ class Main(cocos.layer.Layer):
 
     def throw_piece(self):
         peca = self._hand.remove(self._pieceIndex)
+        self._h_sprites.pop(self._pieceIndex)
         peca.setPrevious(None)
         peca.setNext(None)
         self._domino.insert(peca, 0)
