@@ -67,6 +67,7 @@ class Main(cocos.layer.Layer):
     def on_mouse_press(self, x, y, buttons, modifiers):
         if self.check_click(x,y):
             self._isPieceSelected = True
+            print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
             self._lastPosition = self._h_sprites[self._pieceIndex].position
         else:
             self._isPieceSelected = False
@@ -86,15 +87,15 @@ class Main(cocos.layer.Layer):
     def check_head(self):
         #value for head is on index 0
         if (self._domino.head().getValue()[0] == self._hand.search(self._pieceIndex).getValue()[0]):
-            print("sim", self._hand.search(self._pieceIndex).getValue()[0])
+            self.place_at_left()
         else:
-            print("nao", self._hand.search(self._pieceIndex).getValue())
+            self._h_sprites[self._pieceIndex].position = self._lastPosition
 
     def check_tail(self):
         if (self._domino.head().getValue()[1] == self._hand.search(self._pieceIndex).getValue()[1]):
-            print("sim", self._hand.search(self._pieceIndex).getValue()[1])
+            self.place_at_right()
         else:
-            print("nao", self._hand.search(self._pieceIndex).getValue())
+            self._h_sprites[self._pieceIndex].position = self._lastPosition
 
     def check_highest_piece(self):
         highest = 0
@@ -117,6 +118,12 @@ class Main(cocos.layer.Layer):
     def start_hand(self):
         for i in range(7):
             self._hand.insert(self._pool.sort_peca())
+
+    def place_at_right(self):
+        print("sim", self._hand.search(self._pieceIndex).getValue())
+
+    def place_at_left(self):
+        print("sim", self._hand.search(self._pieceIndex).getValue())
 
     def throw_piece(self):
         peca = self._hand.remove(self._pieceIndex)
