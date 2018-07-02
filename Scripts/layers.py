@@ -84,7 +84,6 @@ class Main(cocos.layer.Layer):
         return check
 
     def check_head(self):
-        print(self._hand.len(), self._h_sprites.__len__(), self._domino.len())
         #value for head is on index 0
         if (self._domino.head().getValue()[0] == self._hand.search(self._pieceIndex).getValue()[0]):
             print("sim", self._hand.search(self._pieceIndex).getValue()[0])
@@ -92,7 +91,10 @@ class Main(cocos.layer.Layer):
             print("nao", self._hand.search(self._pieceIndex).getValue())
 
     def check_tail(self):
-        print(self._hand.len(), self._h_sprites.__len__(), self._domino.len())
+        if (self._domino.head().getValue()[1] == self._hand.search(self._pieceIndex).getValue()[1]):
+            print("sim", self._hand.search(self._pieceIndex).getValue()[1])
+        else:
+            print("nao", self._hand.search(self._pieceIndex).getValue())
 
     def check_highest_piece(self):
         highest = 0
