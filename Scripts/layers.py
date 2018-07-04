@@ -26,9 +26,12 @@ class Main(cocos.layer.Layer):
         self._domino = Domino_struct()
         self.start_hand()
         self._h_sprites = self._hand.hand_sprites()
+        self._d_sprites = []
         self._pieceIndex = None
         self._isPieceSelected = False
         self._lastPosition = None
+        self._indiceHead = 0
+        self._indiceTail = 1
         print(self._hand.len(), self._h_sprites.__len__(),self._domino.len())
 
         self.set_sprites()
@@ -58,7 +61,8 @@ class Main(cocos.layer.Layer):
             else:
                 if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
                     self._h_sprites[self._pieceIndex].position = 1280//2, 720//2
-                    self.throw_piece()
+                    self._d_sprites.insert(0,self._h_sprites.pop(self._pieceIndex))
+                    self.throw_left()
                 else:
                     self._h_sprites[self._pieceIndex].position = self._lastPosition
         else:
@@ -68,6 +72,8 @@ class Main(cocos.layer.Layer):
         if self.check_click(x,y):
             self._isPieceSelected = True
             print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
+            print(self._domino.head())
+            print(self._domino.tail())
             self._lastPosition = self._h_sprites[self._pieceIndex].position
         else:
             self._isPieceSelected = False
@@ -86,13 +92,14 @@ class Main(cocos.layer.Layer):
 
     def check_head(self):
         #value for head is on index 0
-        if (self._domino.head().getValue()[0] == self._hand.search(self._pieceIndex).getValue()[0]):
+        self.count = 0
+        if (self._domino.head().getValue()[self._indiceHead] == self._hand.search(self._pieceIndex).getValue()[self._indiceHead]):
             self.place_at_left()
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
 
     def check_tail(self):
-        if (self._domino.head().getValue()[1] == self._hand.search(self._pieceIndex).getValue()[1]):
+        if (self._domino.tail().getValue()[1] == self._hand.search(self._pieceIndex).getValue()[1]):
             self.place_at_right()
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
@@ -121,15 +128,36 @@ class Main(cocos.layer.Layer):
 
     def place_at_right(self):
         a = self._h_sprites.pop(self._pieceIndex)
-        print("sim", self._hand.search(self._pieceIndex).getValue())
+        self._d_sprites.append(a)
+        self.throw_right()
+        #print("sim", self._hand.show(), self._domino.show())
 
     def place_at_left(self):
         a = self._h_sprites.pop(self._pieceIndex)
-        print("sim", self._hand.search(self._pieceIndex).getValue())
+        self._d_sprites.insert(0,a)
+        self.throw_left()
+        #print("sim", self._hand.show(), self._domino.show())
 
-    def throw_piece(self):
+    def throw_left(self):
         peca = self._hand.remove(self._pieceIndex)
-        self._h_sprites.pop(self._pieceIndex)
         peca.setPrevious(None)
         peca.setNext(None)
         self._domino.insert(peca, 0)
+
+    def throw_right(self):
+        peca = self._hand.remove(self._pieceIndex)
+        peca.setPrevious(None)
+        peca.setNext(None)
+        self._domino.append(peca)
+
+    def change_head(self, n):
+        if n%2 == 0:
+            self._indiceHead = 1
+        else:
+            self._indiceHead = 0
+
+    def change_tail(self, n):
+        if n%2 == 0:
+            self._indiceTail = 0
+        else:
+            self._indiceTail = 1
