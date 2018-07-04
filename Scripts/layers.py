@@ -120,9 +120,11 @@ class Main(cocos.layer.Layer):
             self._hand.insert(self._pool.sort_peca())
 
     def place_at_right(self):
+        a = self._h_sprites.pop(self._pieceIndex)
         print("sim", self._hand.search(self._pieceIndex).getValue())
 
     def place_at_left(self):
+        a = self._h_sprites.pop(self._pieceIndex)
         print("sim", self._hand.search(self._pieceIndex).getValue())
 
     def throw_piece(self):
