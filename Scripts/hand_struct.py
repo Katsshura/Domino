@@ -46,7 +46,7 @@ class Hand_struct:
         pos = 0
         if index > self.len() - 1:
             return False
-        else:
+        elif self._tam > 1:
             while pos != index:
                 atual = atual.getNext()
                 pos += 1
@@ -73,6 +73,12 @@ class Hand_struct:
                 next.setPrevious(previous)
                 self._tam -= 1
                 return atual
+
+        elif self._tam == 1:
+            self._tail = None
+            self._head = None
+            self._tam -= 1
+            return atual
 
 
     def len(self):
