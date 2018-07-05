@@ -61,10 +61,16 @@ class Main(cocos.layer.Layer):
                     self.check_head()
             else:
                 if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
-                    self._h_sprites[self._pieceIndex].position = 1280//2, 720//2
-                    self._h_sprites[self._pieceIndex].rotation = 90
-                    self._d_sprites.insert(0,self._h_sprites.pop(self._pieceIndex))
-                    self.throw()
+                    if self.is_bomb():
+                        self._h_sprites[self._pieceIndex].position = (1280//2), 720//2
+                        self._h_sprites[self._pieceIndex].rotation = 90
+                        self._d_sprites.insert(0,self._h_sprites.pop(self._pieceIndex))
+                        self.throw()
+                    else:
+                        self._h_sprites[self._pieceIndex].position = (1280 // 2) + 83, 720 // 2
+                        self._h_sprites[self._pieceIndex].rotation = -90
+                        self._d_sprites.insert(0, self._h_sprites.pop(self._pieceIndex))
+                        self.throw()
                 else:
                     self._h_sprites[self._pieceIndex].position = self._lastPosition
         else:
@@ -73,6 +79,7 @@ class Main(cocos.layer.Layer):
     def on_mouse_press(self, x, y, buttons, modifiers):
         if self.check_click(x,y):
             self._isPieceSelected = True
+            print(self.is_bomb())
             '''print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
             print(self._domino.head(), self._domino.tail())'''
             self._lastPosition = self._h_sprites[self._pieceIndex].position
@@ -127,6 +134,8 @@ class Main(cocos.layer.Layer):
                 aux += 1
         return pos
 
+    def is_bomb(self):
+        return (self._hand.search(self._pieceIndex).getValue()[0] == self._hand.search(self._pieceIndex).getValue()[1])
 
     def start_hand(self):
         for i in range(7):
@@ -152,11 +161,14 @@ class Main(cocos.layer.Layer):
             peca.getValue()[0] = temp
             self._domino.insert(peca, 0)
             a.rotation = 90
-            a.position = (1280 // 2) -83, 720 // 2
+            print(a.get_rect())
+            a.position = self._d_sprites[0].x - (83//2) + 2, 720 // 2
         elif self._domino.head().getValue()[0] is peca.getValue()[1]:
             self._domino.insert(peca, 0)
             a.rotation = -90
-            a.position = (1280 // 2), (720 // 2)-42
+            print("de baixo: {}".format((83//3)))
+            print(a.get_rect())
+            a.position = self._d_sprites[0].x + 83//2, (720 // 2) - 42
 
     def throw_right(self, a):
         peca = self._hand.remove(self._pieceIndex)
@@ -190,7 +202,7 @@ class Main(cocos.layer.Layer):
         else:
             self._indiceTail = 1
 
-    def change_rotation(self,a):
-        '''print(self._d_sprites)
+    '''def change_rotation(self,a):
+        print(self._d_sprites)
         a.anchor = self._d_sprites[0].get_rect().center'''
-        pass
+
