@@ -5,7 +5,6 @@ from cocos.scene import *
 from pool_struct import *
 from hand_struct import *
 from domino_struct import *
-
 #42x83 each
 
 class Background(cocos.layer.Layer):
@@ -23,8 +22,16 @@ class Main(cocos.layer.Layer):
         super(Main, self).__init__()
         self._pool = Pool()
         self._hand = Hand_struct()
+        self._bot1 = Hand_struct()
+        self._bot2 = Hand_struct()
+        self._bot3 = Hand_struct()
         self._domino = Domino_struct()
+        self._isPlayer = False
+        self._isBot1 = False
+        self._isBot2 = False
+        self._isBot3 = False
         self.start_hand()
+        self.start_bots_hand()
         self._h_sprites = self._hand.hand_sprites()
         self._d_sprites = []
         self._pieceIndex = None
@@ -32,9 +39,6 @@ class Main(cocos.layer.Layer):
         self._lastPosition = None
         self._indiceHead = 0
         self._indiceTail = 1
-        self._countH = 1
-        self._countT = 1
-
         self.set_sprites()
 
     def set_sprites(self):
@@ -53,39 +57,46 @@ class Main(cocos.layer.Layer):
 
     def on_mouse_release(self, x, y, buttons, modifiers):
         self._isPieceSelected = False
-        if self._h_sprites[self._pieceIndex].y > 720//4:
-            if self._domino.len() != 0:
-                 if self._h_sprites[self._pieceIndex].x > 640: #olha pra direita
-                    self.check_tail()
-                 elif self._h_sprites[self._pieceIndex].x < 640: #olha pra esquerda
-                    self.check_head()
-            else:
-                if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
-                    if self.is_bomb():
-                        self._h_sprites[self._pieceIndex].position = (1280//2), 720//2
-                        self._h_sprites[self._pieceIndex].rotation = 90
-                        self._d_sprites.insert(0,self._h_sprites.pop(self._pieceIndex))
-                        self.throw()
-                    else:
-                        self._h_sprites[self._pieceIndex].position = (1280 // 2) + 83, 720 // 2
-                        self._h_sprites[self._pieceIndex].rotation = -90
-                        self._d_sprites.insert(0, self._h_sprites.pop(self._pieceIndex))
-                        self.throw()
+        if self._isPlayer:
+            if self._h_sprites[self._pieceIndex].y > 720//4:
+                if self._domino.len() != 0:
+                     if self._h_sprites[self._pieceIndex].x > 640: #olha pra direita
+                        self.check_tail()
+                     elif self._h_sprites[self._pieceIndex].x < 640: #olha pra esquerda
+                        self.check_head()
                 else:
-                    self._h_sprites[self._pieceIndex].position = self._lastPosition
+                    if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
+                        if self.is_bomb():
+                            self._h_sprites[self._pieceIndex].position = (1280//2), 720//2
+                            self._h_sprites[self._pieceIndex].rotation = 90
+                            self._d_sprites.insert(0,self._h_sprites.pop(self._pieceIndex))
+                            self.throw()
+                        else:
+                            self._h_sprites[self._pieceIndex].position = (1280 // 2) + 83, 720 // 2
+                            self._h_sprites[self._pieceIndex].rotation = -90
+                            self._d_sprites.insert(0, self._h_sprites.pop(self._pieceIndex))
+                            self.throw()
+                    else:
+                        self._h_sprites[self._pieceIndex].position = self._lastPosition
+            else:
+                self._h_sprites[self._pieceIndex].position = self._lastPosition
+
         else:
-            self._h_sprites[self._pieceIndex].position = self._lastPosition
+            pass
 
     def on_mouse_press(self, x, y, buttons, modifiers):
-        if self.check_click(x,y):
-            self._isPieceSelected = True
-            print(self.is_bomb())
-            '''print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
-            print(self._domino.head(), self._domino.tail())'''
-            self._lastPosition = self._h_sprites[self._pieceIndex].position
+        if self._isPlayer:
+            if self.check_click(x,y):
+                self._isPieceSelected = True
+                print(self.is_bomb())
+                '''print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
+                print(self._domino.head(), self._domino.tail())'''
+                self._lastPosition = self._h_sprites[self._pieceIndex].position
+            else:
+                self._isPieceSelected = False
+                self._lastPosition = None
         else:
-            self._isPieceSelected = False
-            self._lastPosition = None
+            print("Not Your Time")
 
         print(self._domino.show())
 
@@ -101,19 +112,14 @@ class Main(cocos.layer.Layer):
         return check
 
     def check_head(self):
-        #value for head is on index 0
-        #self.change_head(self._countH)
         if (self._domino.head().getValue()[self._indiceHead] in self._hand.search(self._pieceIndex).getValue()):
             self.place_at_left()
-            self._countH += 1
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
 
     def check_tail(self):
-        #self.change_tail(self._countT)
         if (self._domino.tail().getValue()[self._indiceTail] in self._hand.search(self._pieceIndex).getValue()):
             self.place_at_right()
-            self._countT += 1
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
 
@@ -139,7 +145,10 @@ class Main(cocos.layer.Layer):
 
     def start_hand(self):
         for i in range(7):
-            self._hand.insert(self._pool.sort_peca())
+            a = self._pool.sort_peca()
+            self._hand.insert(a)
+            if a.getValue()[0] == a.getValue()[1] and a.getValue()[0] == 6:
+                self._isPlayer = True
 
     def place_at_right(self):
         a = self._h_sprites.pop(self._pieceIndex)
@@ -170,6 +179,9 @@ class Main(cocos.layer.Layer):
             print(a.get_rect())
             a.position = self._d_sprites[0].x + 83//2, (720 // 2) - 42
 
+        self._isPlayer = False
+        self._isBot1 = True
+
     def throw_right(self, a):
         peca = self._hand.remove(self._pieceIndex)
         peca.setPrevious(None)
@@ -177,32 +189,46 @@ class Main(cocos.layer.Layer):
         if self._domino.tail().getValue()[1] is peca.getValue()[0]:
             self._domino.append(peca)
             a.rotation = -90
+            if  len(self._d_sprites) > 1:
+                a.position = self._d_sprites[1].x + 83 // 2, (720 // 2) - 42
+            else:
+                a.position = self._d_sprites[0].x + 83 // 2, (720 // 2) - 42
+
         elif self._domino.tail().getValue()[1] is peca.getValue()[1]:
             temp = peca.getValue()[1]
             peca.getValue()[1] = peca.getValue()[0]
             peca.getValue()[0] = temp
             self._domino.append(peca)
             a.rotation = 90
+            if len(self._d_sprites) > 1:
+                a.position = self._d_sprites[1].x + (83 // 2) + 2, 720 // 2
+            else:
+                a.position = self._d_sprites[0].x + (83 // 2) + 2, 720 // 2
+
+            self._isPlayer = False
+            self._isBot1 = True
 
     def throw(self):
         peca = self._hand.remove(self._pieceIndex)
         peca.setPrevious(None)
         peca.setNext(None)
         self._domino.append(peca)
+        self._isPlayer = False
+        self._isBot1 = True
 
-    def change_head(self, n):
-        if n%2 == 0:
-            self._indiceHead = 1
-        else:
-            self._indiceHead = 0
-
-    def change_tail(self, n):
-        if n%2 == 0:
-            self._indiceTail = 0
-        else:
-            self._indiceTail = 1
-
-    '''def change_rotation(self,a):
-        print(self._d_sprites)
-        a.anchor = self._d_sprites[0].get_rect().center'''
-
+    def start_bots_hand(self):
+        for i in range(7):
+            a = self._pool.sort_peca()
+            self._bot1.insert(a)
+            if a.getValue()[0] == a.getValue()[1] and a.getValue()[0] == 6:
+                self._isBot1 = True
+        for i in range(7):
+            b = self._pool.sort_peca()
+            self._bot2.insert(b)
+            if b.getValue()[0] == b.getValue()[1] and b.getValue()[0] == 6:
+                self._isBot2 = True
+        for i in range(7):
+            c = self._pool.sort_peca()
+            self._bot3.insert(c)
+            if c.getValue()[0] == c.getValue()[1] and c.getValue()[0] == 6:
+                self._isBot3 = True
