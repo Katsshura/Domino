@@ -97,6 +97,7 @@ class Main(cocos.layer.Layer):
                 self._lastPosition = None
         else:
             print("Not Your Time")
+            self.bot_time()
 
         print(self._domino.show())
 
@@ -232,3 +233,89 @@ class Main(cocos.layer.Layer):
             self._bot3.insert(c)
             if c.getValue()[0] == c.getValue()[1] and c.getValue()[0] == 6:
                 self._isBot3 = True
+
+    def bot_time(self):
+        if self._isBot1:
+            if self._domino.len() != 0:
+                for i in range(self._bot1.len()):
+                    peca = self._bot1.search(i)
+                    if (self._domino.head().getValue()[0] in peca.getValue()) or (self._domino.tail().getValue()[0] in peca.getValue()):
+                        print("Bot 1 Tem peça")
+                        self._isBot1 = False
+                        self._isBot2 = True
+                        break
+            else:
+                for i in range(self._bot1.len()):
+                    p = self._bot1.search(i)
+                    if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
+                        print("Comecando a mao bot1" + " " + self._bot1.show())
+                        self.throw_bot(1, i)
+                        self._isBot1 = False
+                        self._isBot2 = True
+                        break
+        elif self._isBot2:
+            if self._domino.len() != 0:
+                for i in range(self._bot2.len()):
+                    peca = self._bot2.search(i)
+                    if (self._domino.head().getValue()[0] in peca.getValue()) or (self._domino.tail().getValue()[0] in peca.getValue()):
+                        print("Bot 2 Tem peça")
+                        self._isBot2 = False
+                        self._isBot3 = True
+                        break
+            else:
+                for i in range(self._bot2.len()):
+                    p = self._bot2.search(i)
+                    if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
+                        print("Comecando a mao bot2" + " " + self._bot2.show())
+                        self.throw_bot(2, i)
+                        self._isBot2 = False
+                        self._isBot3 = True
+                        break
+        elif self._isBot3:
+            if self._domino.len() != 0:
+                for i in range(self._bot3.len()):
+                    peca = self._bot3.search(i)
+                    print(peca, "+", self._bot3.show())
+                    if (self._domino.head().getValue()[0] in peca.getValue()) or (self._domino.tail().getValue()[0] in peca.getValue()):
+                        print("Bot 3 Tem peça")
+                        self._isBot3 = False
+                        self._isPlayer = True
+                        break
+            else:
+                for i in range(self._bot3.len()):
+                    p = self._bot3.search(i)
+                    if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
+                        print("Comecando a mao bot3" + " " + self._bot3.show())
+                        self.throw_bot(3, i)
+                        self._isBot3 = False
+                        self._isPlayer = True
+                        break
+
+
+    def throw_bot(self, bot, index):
+        if bot == 1:
+            if self._domino.len() != 0:
+                pass
+            else:
+                peca = self._bot1.remove(index)
+                peca.setPrevious(None)
+                peca.setNext(None)
+                self._domino.insert(peca,1)
+        elif bot == 2:
+            if self._domino.len() != 0:
+                pass
+            else:
+                peca = self._bot2.remove(index)
+                peca.setPrevious(None)
+                peca.setNext(None)
+                self._domino.insert(peca, 1)
+        elif bot == 3:
+            if self._domino.len() != 0:
+                pass
+            else:
+                peca = self._bot3.remove(index)
+                peca.setPrevious(None)
+                peca.setNext(None)
+                self._domino.insert(peca, 1)
+        else:
+            raise("Exception, no bot found")
