@@ -41,6 +41,10 @@ class Main(cocos.layer.Layer):
         self._indiceTail = 1
         self.set_sprites()
 
+        layer = cocos.layer.ColorLayer(255, 255, 255, 255, width=100, height=30)
+        layer.position = (1100, 25)
+        self.add(layer)
+
     def set_sprites(self):
         pos_x = -125
         for i in range(7):
@@ -89,8 +93,8 @@ class Main(cocos.layer.Layer):
             if self.check_click(x,y):
                 self._isPieceSelected = True
                 print(self.is_bomb())
-                '''print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
-                print(self._domino.head(), self._domino.tail())'''
+                print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
+                '''print(self._domino.head(), self._domino.tail())'''
                 self._lastPosition = self._h_sprites[self._pieceIndex].position
             else:
                 self._isPieceSelected = False
@@ -99,7 +103,7 @@ class Main(cocos.layer.Layer):
             print("Not Your Time")
             self.bot_time()
 
-        print(self._domino.show())
+            print("Bot 1 - " + str(self._bot1.show()), "\n" + "Bot 2 - " + str(self._bot2.show()),"\n" + "Bot 3 - " + str(self._bot3.show()), "\n" + "Domino - " + str(self._domino.show()))
 
     def check_click(self,x,y):
         check = False
@@ -206,8 +210,8 @@ class Main(cocos.layer.Layer):
             else:
                 a.position = self._d_sprites[0].x + (83 // 2) + 2, 720 // 2
 
-            self._isPlayer = False
-            self._isBot1 = True
+        self._isPlayer = False
+        self._isBot1 = True
 
     def throw(self):
         peca = self._hand.remove(self._pieceIndex)
@@ -239,63 +243,123 @@ class Main(cocos.layer.Layer):
             if self._domino.len() != 0:
                 for i in range(self._bot1.len()):
                     peca = self._bot1.search(i)
-                    if (self._domino.head().getValue()[0] in peca.getValue()) or (self._domino.tail().getValue()[0] in peca.getValue()):
+                    if (self._domino.head().getValue()[0] in peca.getValue()):
                         print("Bot 1 Tem peça")
+                        self.throw_bot(1,i,0)
                         self._isBot1 = False
                         self._isBot2 = True
                         break
+                    elif (self._domino.tail().getValue()[1] in peca.getValue()):
+                        print("Bot 1 Tem peça")
+                        self.throw_bot(1,i,1)
+                        self._isBot1 = False
+                        self._isBot2 = True
+                        break
+                    else:
+                        self._isBot1 = False
+                        self._isBot2 = True
             else:
                 for i in range(self._bot1.len()):
                     p = self._bot1.search(i)
                     if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
                         print("Comecando a mao bot1" + " " + self._bot1.show())
-                        self.throw_bot(1, i)
+                        self.throw_bot(1, i, 0)
                         self._isBot1 = False
                         self._isBot2 = True
                         break
+                    else:
+                        self._isBot1 = False
+                        self._isBot2 = True
         elif self._isBot2:
             if self._domino.len() != 0:
                 for i in range(self._bot2.len()):
                     peca = self._bot2.search(i)
-                    if (self._domino.head().getValue()[0] in peca.getValue()) or (self._domino.tail().getValue()[0] in peca.getValue()):
+                    if (self._domino.head().getValue()[0] in peca.getValue()):
                         print("Bot 2 Tem peça")
+                        self.throw_bot(2, i, 0)
                         self._isBot2 = False
                         self._isBot3 = True
                         break
+                    elif (self._domino.tail().getValue()[1] in peca.getValue()):
+                        print("Bot 2 Tem peça")
+                        self.throw_bot(2, i, 1)
+                        self._isBot2 = False
+                        self._isBot3 = True
+                        break
+                    else:
+                        self._isBot2 = False
+                        self._isBot3 = True
             else:
                 for i in range(self._bot2.len()):
                     p = self._bot2.search(i)
                     if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
                         print("Comecando a mao bot2" + " " + self._bot2.show())
-                        self.throw_bot(2, i)
+                        self.throw_bot(2, i, 0)
                         self._isBot2 = False
                         self._isBot3 = True
                         break
+                    else:
+                        self._isBot2 = False
+                        self._isBot3 = True
         elif self._isBot3:
             if self._domino.len() != 0:
                 for i in range(self._bot3.len()):
                     peca = self._bot3.search(i)
                     print(peca, "+", self._bot3.show())
-                    if (self._domino.head().getValue()[0] in peca.getValue()) or (self._domino.tail().getValue()[0] in peca.getValue()):
+                    if (self._domino.head().getValue()[0] in peca.getValue()):
                         print("Bot 3 Tem peça")
+                        self.throw_bot(3, i, 0)
                         self._isBot3 = False
                         self._isPlayer = True
                         break
+                    elif (self._domino.tail().getValue()[1] in peca.getValue()):
+                        print("Bot 3 Tem peça")
+                        self.throw_bot(3, i, 1)
+                        self._isBot3 = False
+                        self._isPlayer = True
+                        break
+                    else:
+                        self._isBot3 = False
+                        self._isPlayer = True
             else:
                 for i in range(self._bot3.len()):
                     p = self._bot3.search(i)
                     if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
                         print("Comecando a mao bot3" + " " + self._bot3.show())
-                        self.throw_bot(3, i)
+                        self.throw_bot(3, i, 0)
                         self._isBot3 = False
                         self._isPlayer = True
                         break
+                    else:
+                        self._isBot3 = False
+                        self._isPlayer = True
 
 
-    def throw_bot(self, bot, index):
+    def throw_bot(self, bot, index, position):
         if bot == 1:
             if self._domino.len() != 0:
-                pass
+                if position == 0:
+                    peca = self._bot1.remove(index)
+                    peca.setPrevious(None)
+                    peca.setNext(None)
+                    if self._domino.head().getValue()[0] is peca.getValue()[0]:
+                        temp = peca.getValue()[1]
+                        peca.getValue()[1] = peca.getValue()[0]
+                        peca.getValue()[0] = temp
+                        self._domino.insert(peca, 0)
+                    elif self._domino.head().getValue()[0] is peca.getValue()[1]:
+                        self._domino.insert(peca, 0)
+                elif position == 1:
+                    peca = self._bot1.remove(self._pieceIndex)
+                    peca.setPrevious(None)
+                    peca.setNext(None)
+                    if self._domino.tail().getValue()[1] is peca.getValue()[0]:
+                        self._domino.append(peca)
+                    elif self._domino.tail().getValue()[1] is peca.getValue()[1]:
+                        temp = peca.getValue()[1]
+                        peca.getValue()[1] = peca.getValue()[0]
+                        peca.getValue()[0] = temp
+                        self._domino.append(peca)
             else:
                 peca = self._bot1.remove(index)
                 peca.setPrevious(None)
@@ -303,7 +367,28 @@ class Main(cocos.layer.Layer):
                 self._domino.insert(peca,1)
         elif bot == 2:
             if self._domino.len() != 0:
-                pass
+                if position == 0:
+                    peca = self._bot2.remove(index)
+                    peca.setPrevious(None)
+                    peca.setNext(None)
+                    if self._domino.head().getValue()[0] is peca.getValue()[0]:
+                        temp = peca.getValue()[1]
+                        peca.getValue()[1] = peca.getValue()[0]
+                        peca.getValue()[0] = temp
+                        self._domino.insert(peca, 0)
+                    elif self._domino.head().getValue()[0] is peca.getValue()[1]:
+                        self._domino.insert(peca, 0)
+                elif position == 1:
+                    peca = self._bot2.remove(self._pieceIndex)
+                    peca.setPrevious(None)
+                    peca.setNext(None)
+                    if self._domino.tail().getValue()[1] is peca.getValue()[0]:
+                        self._domino.append(peca)
+                    elif self._domino.tail().getValue()[1] is peca.getValue()[1]:
+                        temp = peca.getValue()[1]
+                        peca.getValue()[1] = peca.getValue()[0]
+                        peca.getValue()[0] = temp
+                        self._domino.append(peca)
             else:
                 peca = self._bot2.remove(index)
                 peca.setPrevious(None)
@@ -311,7 +396,28 @@ class Main(cocos.layer.Layer):
                 self._domino.insert(peca, 1)
         elif bot == 3:
             if self._domino.len() != 0:
-                pass
+                if position == 0:
+                    peca = self._bot3.remove(index)
+                    peca.setPrevious(None)
+                    peca.setNext(None)
+                    if self._domino.head().getValue()[0] is peca.getValue()[0]:
+                        temp = peca.getValue()[1]
+                        peca.getValue()[1] = peca.getValue()[0]
+                        peca.getValue()[0] = temp
+                        self._domino.insert(peca, 0)
+                    elif self._domino.head().getValue()[0] is peca.getValue()[1]:
+                        self._domino.insert(peca, 0)
+                elif position == 1:
+                    peca = self._bot3.remove(self._pieceIndex)
+                    peca.setPrevious(None)
+                    peca.setNext(None)
+                    if self._domino.tail().getValue()[1] is peca.getValue()[0]:
+                        self._domino.append(peca)
+                    elif self._domino.tail().getValue()[1] is peca.getValue()[1]:
+                        temp = peca.getValue()[1]
+                        peca.getValue()[1] = peca.getValue()[0]
+                        peca.getValue()[0] = temp
+                        self._domino.append(peca)
             else:
                 peca = self._bot3.remove(index)
                 peca.setPrevious(None)
