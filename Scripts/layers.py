@@ -40,10 +40,13 @@ class Main(cocos.layer.Layer):
         self._indiceHead = 0
         self._indiceTail = 1
         self.set_sprites()
+        self._label = cocos.text.Label("",font_name='Times New Roman',font_size=32,anchor_x='center',anchor_y='center')
 
         layer = cocos.layer.ColorLayer(255, 255, 255, 255, width=100, height=30)
         layer.position = (1100, 25)
         self.add(layer)
+        self._label.position = 1280//2, 720//2
+        self.add(self._label)
 
     def set_sprites(self):
         pos_x = -125
@@ -97,14 +100,17 @@ class Main(cocos.layer.Layer):
                 '''print(self._domino.head(), self._domino.tail())'''
                 self._lastPosition = self._h_sprites[self._pieceIndex].position
             else:
+                if self.pass_button(x,y):
+                    self._isPlayer = False
+                    self._isBot1 = True
+                    self.bot_time()
                 self._isPieceSelected = False
                 self._lastPosition = None
         else:
             print("Not Your Time")
             self.bot_time()
 
-            print("Bot 1 - " + str(self._bot1.show()), "\n" + "Bot 2 - " + str(self._bot2.show()),"\n" + "Bot 3 - " + str(self._bot3.show()), "\n" + "Domino - " + str(self._domino.show()))
-
+        print("Bot 1 - " + str(self._bot1.show()), "\n" + "Bot 2 - " + str(self._bot2.show()),"\n" + "Bot 3 - " + str(self._bot3.show()), "\n" + "Domino - " + str(self._domino.show()))
     def check_click(self,x,y):
         check = False
         pos = 0
@@ -186,6 +192,7 @@ class Main(cocos.layer.Layer):
 
         self._isPlayer = False
         self._isBot1 = True
+        self.bot_time()
 
     def throw_right(self, a):
         peca = self._hand.remove(self._pieceIndex)
@@ -212,6 +219,7 @@ class Main(cocos.layer.Layer):
 
         self._isPlayer = False
         self._isBot1 = True
+        self.bot_time()
 
     def throw(self):
         peca = self._hand.remove(self._pieceIndex)
@@ -220,6 +228,7 @@ class Main(cocos.layer.Layer):
         self._domino.append(peca)
         self._isPlayer = False
         self._isBot1 = True
+        self.bot_time()
 
     def start_bots_hand(self):
         for i in range(7):
@@ -237,6 +246,8 @@ class Main(cocos.layer.Layer):
             self._bot3.insert(c)
             if c.getValue()[0] == c.getValue()[1] and c.getValue()[0] == 6:
                 self._isBot3 = True
+
+        self.bot_time()
 
     def bot_time(self):
         if self._isBot1:
@@ -270,6 +281,14 @@ class Main(cocos.layer.Layer):
                     else:
                         self._isBot1 = False
                         self._isBot2 = True
+            if self._bot1.len() != 0:
+                self.bot_time()
+            else:
+                self._label.element.text = "Bot 1 Venceu!!"
+                self._isPlayer = False
+                self._isBot1 = False
+                self._isBot2 = False
+                self._isBot3 = False
         elif self._isBot2:
             if self._domino.len() != 0:
                 for i in range(self._bot2.len()):
@@ -301,11 +320,19 @@ class Main(cocos.layer.Layer):
                     else:
                         self._isBot2 = False
                         self._isBot3 = True
+            if self._bot2.len() != 0:
+                self.bot_time()
+            else:
+                self._label.element.text = "Bot 2 Venceu!!"
+                self._isPlayer = False
+                self._isBot1 = False
+                self._isBot2 = False
+                self._isBot3 = False
+
         elif self._isBot3:
             if self._domino.len() != 0:
                 for i in range(self._bot3.len()):
                     peca = self._bot3.search(i)
-                    print(peca, "+", self._bot3.show())
                     if (self._domino.head().getValue()[0] in peca.getValue()):
                         print("Bot 3 Tem peça")
                         self.throw_bot(3, i, 0)
@@ -334,6 +361,13 @@ class Main(cocos.layer.Layer):
                         self._isBot3 = False
                         self._isPlayer = True
 
+            if self._bot3.len() == 0:
+                self._label.element.text = "Bot 3 Venceu!!"
+                self._isPlayer = False
+                self._isBot1 = False
+                self._isBot2 = False
+                self._isBot3 = False
+
 
     def throw_bot(self, bot, index, position):
         if bot == 1:
@@ -350,7 +384,7 @@ class Main(cocos.layer.Layer):
                     elif self._domino.head().getValue()[0] is peca.getValue()[1]:
                         self._domino.insert(peca, 0)
                 elif position == 1:
-                    peca = self._bot1.remove(self._pieceIndex)
+                    peca = self._bot1.remove(index)
                     peca.setPrevious(None)
                     peca.setNext(None)
                     if self._domino.tail().getValue()[1] is peca.getValue()[0]:
@@ -379,7 +413,7 @@ class Main(cocos.layer.Layer):
                     elif self._domino.head().getValue()[0] is peca.getValue()[1]:
                         self._domino.insert(peca, 0)
                 elif position == 1:
-                    peca = self._bot2.remove(self._pieceIndex)
+                    peca = self._bot2.remove(index)
                     peca.setPrevious(None)
                     peca.setNext(None)
                     if self._domino.tail().getValue()[1] is peca.getValue()[0]:
@@ -408,7 +442,7 @@ class Main(cocos.layer.Layer):
                     elif self._domino.head().getValue()[0] is peca.getValue()[1]:
                         self._domino.insert(peca, 0)
                 elif position == 1:
-                    peca = self._bot3.remove(self._pieceIndex)
+                    peca = self._bot3.remove(index)
                     peca.setPrevious(None)
                     peca.setNext(None)
                     if self._domino.tail().getValue()[1] is peca.getValue()[0]:
@@ -425,3 +459,12 @@ class Main(cocos.layer.Layer):
                 self._domino.insert(peca, 1)
         else:
             raise("Exception, no bot found")
+
+
+    def pass_button(self,x,y):
+        if x >= 1100 and x <= 1200:
+            if y >= 25 and y <= 55:
+                return True
+            return False
+        else:
+            return False
