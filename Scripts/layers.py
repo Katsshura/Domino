@@ -5,6 +5,7 @@ from cocos.scene import *
 from pool_struct import *
 from hand_struct import *
 from domino_struct import *
+import time
 #42x83 each
 
 class Background(cocos.layer.Layer):
@@ -30,6 +31,11 @@ class Main(cocos.layer.Layer):
         self._isBot1 = False
         self._isBot2 = False
         self._isBot3 = False
+        self._isGameClosed = False
+        self._bot1Passed = False
+        self._bot2Passed = False
+        self._bot3Passed = False
+        self._playerPassed = False
         self.start_hand()
         self.start_bots_hand()
         self._h_sprites = self._hand.hand_sprites()
@@ -102,6 +108,7 @@ class Main(cocos.layer.Layer):
             else:
                 if self.pass_button(x,y):
                     self._isPlayer = False
+                    self._playerPassed = True
                     self._isBot1 = True
                     self.bot_time()
                 self._isPieceSelected = False
@@ -111,6 +118,7 @@ class Main(cocos.layer.Layer):
             self.bot_time()
 
         print("Bot 1 - " + str(self._bot1.show()), "\n" + "Bot 2 - " + str(self._bot2.show()),"\n" + "Bot 3 - " + str(self._bot3.show()), "\n" + "Domino - " + str(self._domino.show()))
+        print("Bot 1 Passou - " + str(self._bot1Passed), "\n" + "Bot 2 Passou - " + str(self._bot2Passed),"\n" + "Bot 3 Passou - " + str(self._bot3Passed))
     def check_click(self,x,y):
         check = False
         pos = 0
@@ -191,8 +199,10 @@ class Main(cocos.layer.Layer):
             a.position = self._d_sprites[0].x + 83//2, (720 // 2) - 42
 
         self._isPlayer = False
+        self._playerPassed = False
         self._isBot1 = True
         self.bot_time()
+        self.is_player_winner()
 
     def throw_right(self, a):
         peca = self._hand.remove(self._pieceIndex)
@@ -218,8 +228,10 @@ class Main(cocos.layer.Layer):
                 a.position = self._d_sprites[0].x + (83 // 2) + 2, 720 // 2
 
         self._isPlayer = False
+        self._playerPassed = False
         self._isBot1 = True
         self.bot_time()
+        self.is_player_winner()
 
     def throw(self):
         peca = self._hand.remove(self._pieceIndex)
@@ -259,15 +271,18 @@ class Main(cocos.layer.Layer):
                         self.throw_bot(1,i,0)
                         self._isBot1 = False
                         self._isBot2 = True
+                        self._bot1Passed = False
                         break
                     elif (self._domino.tail().getValue()[1] in peca.getValue()):
                         print("Bot 1 Tem peça")
                         self.throw_bot(1,i,1)
                         self._isBot1 = False
+                        self._bot1Passed = False
                         self._isBot2 = True
                         break
                     else:
                         self._isBot1 = False
+                        self._bot1Passed = True
                         self._isBot2 = True
             else:
                 for i in range(self._bot1.len()):
@@ -297,16 +312,19 @@ class Main(cocos.layer.Layer):
                         print("Bot 2 Tem peça")
                         self.throw_bot(2, i, 0)
                         self._isBot2 = False
+                        self._bot2Passed = False
                         self._isBot3 = True
                         break
                     elif (self._domino.tail().getValue()[1] in peca.getValue()):
                         print("Bot 2 Tem peça")
                         self.throw_bot(2, i, 1)
                         self._isBot2 = False
+                        self._bot2Passed = False
                         self._isBot3 = True
                         break
                     else:
                         self._isBot2 = False
+                        self._bot2Passed = True
                         self._isBot3 = True
             else:
                 for i in range(self._bot2.len()):
@@ -337,16 +355,19 @@ class Main(cocos.layer.Layer):
                         print("Bot 3 Tem peça")
                         self.throw_bot(3, i, 0)
                         self._isBot3 = False
+                        self._bot3Passed = False
                         self._isPlayer = True
                         break
                     elif (self._domino.tail().getValue()[1] in peca.getValue()):
                         print("Bot 3 Tem peça")
                         self.throw_bot(3, i, 1)
                         self._isBot3 = False
+                        self._bot3Passed = False
                         self._isPlayer = True
                         break
                     else:
                         self._isBot3 = False
+                        self._bot3Passed = True
                         self._isPlayer = True
             else:
                 for i in range(self._bot3.len()):
@@ -368,6 +389,9 @@ class Main(cocos.layer.Layer):
                 self._isBot2 = False
                 self._isBot3 = False
 
+        if self._bot1Passed == True and self._bot2Passed == True and self._bot3Passed == True and self._playerPassed == True and not self._isGameClosed:
+            self._isGameClosed = True
+            self.count()
 
     def throw_bot(self, bot, index, position):
         if bot == 1:
@@ -468,3 +492,56 @@ class Main(cocos.layer.Layer):
             return False
         else:
             return False
+
+    def count(self):
+        winner = ""
+        score = 0
+        player_score = 0
+        bot1_score = 0
+        bot2_score = 0
+        bot3_score = 0
+
+        self._label.element.text = "Contagem de Pontos"
+
+        for p in range(self._hand.len()):
+            peca = self._hand.search(p)
+            player_score += (peca.getValue()[0] + peca.getValue()[1])
+
+            score = player_score
+            winner = "voce"
+
+        for i in range(self._bot1.len()):
+            peca = self._bot1.search(i)
+            bot1_score += (peca.getValue()[0] + peca.getValue()[1])
+        if bot1_score < score:
+            score = bot1_score
+            winner = "Bot 1"
+
+        for i in range(self._bot2.len()):
+            peca = self._bot2.search(i)
+            bot2_score += (peca.getValue()[0] + peca.getValue()[1])
+        if bot2_score < score:
+            score = bot2_score
+            winner = "Bot 2"
+
+        for i in range(self._bot3.len()):
+            peca = self._bot3.search(i)
+            bot3_score += (peca.getValue()[0] + peca.getValue()[1])
+        if bot3_score < score:
+            score = bot3_score
+            winner = "Bot 3"
+
+
+        self._label.element.text = "O Ganhador foi: " + winner
+        self._isPlayer = False
+        self._isBot1 = False
+        self._isBot2 = False
+        self._isBot3 = False
+
+    def is_player_winner(self):
+        if self._hand.len() == 0:
+            self._label.element.text = "Voce Venceu, Parabens"
+            self._isPlayer = False
+            self._isBot1 = False
+            self._isBot2 = False
+            self._isBot3 = False
