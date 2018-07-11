@@ -6,7 +6,6 @@ from pool_struct import *
 from hand_struct import *
 from domino_struct import *
 import time
-#42x83 each
 
 class Background(cocos.layer.Layer):
     def __init__(self):
@@ -15,6 +14,7 @@ class Background(cocos.layer.Layer):
         background = cocos.sprite.Sprite('background.png')
         background.position = 1280 // 2, 720 // 2
         self.add(background)
+
 
 class Main(cocos.layer.Layer):
     is_event_handler = True
@@ -46,43 +46,45 @@ class Main(cocos.layer.Layer):
         self._indiceHead = 0
         self._indiceTail = 1
         self.set_sprites()
-        self._label = cocos.text.Label("",font_name='Times New Roman',font_size=32,anchor_x='center',anchor_y='center')
+        self._label = cocos.text.Label("", font_name='Times New Roman', font_size=32, anchor_x='center',
+                                       anchor_y='center')
 
         layer = cocos.layer.ColorLayer(255, 255, 255, 255, width=100, height=30)
         layer.position = (1100, 25)
         self.add(layer)
-        self._label.position = 1280//2, 720//2
+        self._label.position = 1280 // 2, 720 // 2
         self.add(self._label)
+        self.load_parts_on_screen()
 
     def set_sprites(self):
         pos_x = -125
         for i in range(7):
             sprite = self._h_sprites[i]
             sprite.anchor = sprite.get_rect().bottomleft
-            sprite.position = (1280//2) + pos_x, (720//2)-250
+            sprite.position = (1280 // 2) + pos_x, (720 // 2) - 250
             sprite.scale = 0.45
             self.add(sprite)
             pos_x += 50
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if self._isPieceSelected:
-            self._h_sprites[self._pieceIndex].position = x+31, y+51
+            self._h_sprites[self._pieceIndex].position = x + 31, y + 51
 
     def on_mouse_release(self, x, y, buttons, modifiers):
         self._isPieceSelected = False
         if self._isPlayer:
-            if self._h_sprites[self._pieceIndex].y > 720//4:
+            if self._h_sprites[self._pieceIndex].y > 720 // 4:
                 if self._domino.len() != 0:
-                     if self._h_sprites[self._pieceIndex].x > 640: #olha pra direita
+                    if self._h_sprites[self._pieceIndex].x > 640:  # olha pra direita
                         self.check_tail()
-                     elif self._h_sprites[self._pieceIndex].x < 640: #olha pra esquerda
+                    elif self._h_sprites[self._pieceIndex].x < 640:  # olha pra esquerda
                         self.check_head()
                 else:
-                    if(self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
+                    if (self._hand.search(self._pieceIndex) == self._hand.search(self.check_highest_piece())):
                         if self.is_bomb():
-                            self._h_sprites[self._pieceIndex].position = (1280//2), 720//2
+                            self._h_sprites[self._pieceIndex].position = (1280 // 2), 720 // 2
                             self._h_sprites[self._pieceIndex].rotation = 90
-                            self._d_sprites.insert(0,self._h_sprites.pop(self._pieceIndex))
+                            self._d_sprites.insert(0, self._h_sprites.pop(self._pieceIndex))
                             self.throw()
                         else:
                             self._h_sprites[self._pieceIndex].position = (1280 // 2) + 83, 720 // 2
@@ -99,14 +101,14 @@ class Main(cocos.layer.Layer):
 
     def on_mouse_press(self, x, y, buttons, modifiers):
         if self._isPlayer:
-            if self.check_click(x,y):
+            if self.check_click(x, y):
                 self._isPieceSelected = True
                 print(self.is_bomb())
                 print(self._pieceIndex, self._hand.search(self._pieceIndex), self._hand.len())
                 '''print(self._domino.head(), self._domino.tail())'''
                 self._lastPosition = self._h_sprites[self._pieceIndex].position
             else:
-                if self.pass_button(x,y):
+                if self.pass_button(x, y):
                     self._isPlayer = False
                     self._playerPassed = True
                     self._isBot1 = True
@@ -123,7 +125,7 @@ class Main(cocos.layer.Layer):
         check = False
         pos = 0
         while pos < len(self._h_sprites) and not check:
-            if self._h_sprites[pos].get_rect().contains(x,y):
+            if self._h_sprites[pos].get_rect().contains(x, y):
                 check = True
                 self._pieceIndex = pos
             else:
@@ -149,7 +151,7 @@ class Main(cocos.layer.Layer):
         for i in range(self._hand.len()):
             peca = self._hand.search(i)
             peca_value = peca.getValue()[0] + peca.getValue()[1]
-            if(peca.getValue()[0] == peca.getValue()[1] and self._domino.len() == 0):
+            if (peca.getValue()[0] == peca.getValue()[1] and self._domino.len() == 0):
                 peca_value += 20
             if peca_value > highest:
                 highest = peca_value
@@ -176,7 +178,7 @@ class Main(cocos.layer.Layer):
 
     def place_at_left(self):
         a = self._h_sprites.pop(self._pieceIndex)
-        self._d_sprites.insert(0,a)
+        self._d_sprites.insert(0, a)
         self.throw_left(a)
 
     def throw_left(self, a):
@@ -190,13 +192,13 @@ class Main(cocos.layer.Layer):
             self._domino.insert(peca, 0)
             a.rotation = 90
             print(a.get_rect())
-            a.position = self._d_sprites[0].x - (83//2) + 2, 720 // 2
+            a.position = self._d_sprites[0].x - (83 // 2) + 2, 720 // 2
         elif self._domino.head().getValue()[0] is peca.getValue()[1]:
             self._domino.insert(peca, 0)
             a.rotation = -90
-            print("de baixo: {}".format((83//3)))
+            print("de baixo: {}".format((83 // 3)))
             print(a.get_rect())
-            a.position = self._d_sprites[0].x + 83//2, (720 // 2) - 42
+            a.position = self._d_sprites[0].x + 83 // 2, (720 // 2) - 42
 
         self._isPlayer = False
         self._playerPassed = False
@@ -211,7 +213,7 @@ class Main(cocos.layer.Layer):
         if self._domino.tail().getValue()[1] is peca.getValue()[0]:
             self._domino.append(peca)
             a.rotation = -90
-            if  len(self._d_sprites) > 1:
+            if len(self._d_sprites) > 1:
                 a.position = self._d_sprites[1].x + 83 // 2, (720 // 2) - 42
             else:
                 a.position = self._d_sprites[0].x + 83 // 2, (720 // 2) - 42
@@ -268,14 +270,14 @@ class Main(cocos.layer.Layer):
                     peca = self._bot1.search(i)
                     if (self._domino.head().getValue()[0] in peca.getValue()):
                         print("Bot 1 Tem peça")
-                        self.throw_bot(1,i,0)
+                        self.throw_bot(1, i, 0)
                         self._isBot1 = False
                         self._isBot2 = True
                         self._bot1Passed = False
                         break
                     elif (self._domino.tail().getValue()[1] in peca.getValue()):
                         print("Bot 1 Tem peça")
-                        self.throw_bot(1,i,1)
+                        self.throw_bot(1, i, 1)
                         self._isBot1 = False
                         self._bot1Passed = False
                         self._isBot2 = True
@@ -287,7 +289,7 @@ class Main(cocos.layer.Layer):
             else:
                 for i in range(self._bot1.len()):
                     p = self._bot1.search(i)
-                    if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
+                    if (p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
                         print("Comecando a mao bot1" + " " + self._bot1.show())
                         self.throw_bot(1, i, 0)
                         self._isBot1 = False
@@ -329,7 +331,7 @@ class Main(cocos.layer.Layer):
             else:
                 for i in range(self._bot2.len()):
                     p = self._bot2.search(i)
-                    if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
+                    if (p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
                         print("Comecando a mao bot2" + " " + self._bot2.show())
                         self.throw_bot(2, i, 0)
                         self._isBot2 = False
@@ -372,7 +374,7 @@ class Main(cocos.layer.Layer):
             else:
                 for i in range(self._bot3.len()):
                     p = self._bot3.search(i)
-                    if(p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
+                    if (p.getValue()[0] == p.getValue()[1] and p.getValue()[0] == 6):
                         print("Comecando a mao bot3" + " " + self._bot3.show())
                         self.throw_bot(3, i, 0)
                         self._isBot3 = False
@@ -422,7 +424,7 @@ class Main(cocos.layer.Layer):
                 peca = self._bot1.remove(index)
                 peca.setPrevious(None)
                 peca.setNext(None)
-                self._domino.insert(peca,1)
+                self._domino.insert(peca, 1)
         elif bot == 2:
             if self._domino.len() != 0:
                 if position == 0:
@@ -482,10 +484,9 @@ class Main(cocos.layer.Layer):
                 peca.setNext(None)
                 self._domino.insert(peca, 1)
         else:
-            raise("Exception, no bot found")
+            raise ("Exception, no bot found")
 
-
-    def pass_button(self,x,y):
+    def pass_button(self, x, y):
         if x >= 1100 and x <= 1200:
             if y >= 25 and y <= 55:
                 return True
@@ -545,3 +546,30 @@ class Main(cocos.layer.Layer):
             self._isBot1 = False
             self._isBot2 = False
             self._isBot3 = False
+
+    def load_parts_on_screen(self):
+        array_sprite_bot1 = self._bot1.hand_sprites()
+        self.get_sprites(array_sprite_bot1, 1280, -125, 50, "y")
+        array_sprite_bot2 = self._bot2.hand_sprites()
+        self.get_sprites(array_sprite_bot2, -150, 720, 50, "x")
+        array_sprite_bot3 = self._bot3.hand_sprites()
+        self.get_sprites(array_sprite_bot3, 0, -125, 50, "y")
+
+    def get_sprites(self, array, pos_x, pos_y, space, type):
+        if type == 'x':
+            for i in range(len(array)):
+                sprite = array[i]
+                sprite.position = (1280 // 2) + pos_x, pos_y
+                sprite.scale = 0.45
+                self.add(sprite)
+                pos_x += space
+        else:
+            for i in range(len(array)):
+                sprite = array[i]
+                sprite.rotation = -90
+                sprite.position = pos_x, (720 // 2) + pos_y
+                sprite.scale = 0.45
+                self.add(sprite)
+                pos_y += space
+
+        return pos_x
