@@ -15,7 +15,7 @@ class Pool:
                 y = x
                 while y != 7:
                     self._peca = Peca_Domino(x, y)
-                    self._peca.setSprite(cocos.sprite.Sprite("peca" + str(i) + ".png"))
+                    self._peca.set_sprite(cocos.sprite.Sprite("peca" + str(i) + ".png"))
                     self._pool.append(self._peca)
                     i += 1
                     y += 1
