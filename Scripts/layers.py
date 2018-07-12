@@ -77,6 +77,13 @@ class Main(cocos.layer.Layer):
         layerText.position = (100 // 2, 30 // 2)
         layer.add(layerText)
         # Da linha 64 a 72 cria o label para passar a vez
+
+        bomb6 = cocos.sprite.Sprite("peca28.png")
+        bomb6.anchor = bomb6.get_rect().bottomleft
+        bomb6.position = (1280//2),(720//2)
+        bomb6.scale = 0.45
+        self.add(bomb6)
+
         self.add(layer)  # Adiciona o botao no layer principal
         self._label.position = 1280 // 2, 720 - (720 // 8)  # Define a posicao do texto
         self.add(self._label)
@@ -84,7 +91,7 @@ class Main(cocos.layer.Layer):
     # Exibe na tela as pecas da mao do player
     def set_sprites(self):
         pos_x = -125
-        for i in range(7):
+        for i in range(self._hand.len()):
             sprite = self._h_sprites[i]
             sprite.anchor = sprite.get_rect().bottomleft
             sprite.position = (1280 // 2) + pos_x, (720 // 2) - 250
@@ -208,9 +215,11 @@ class Main(cocos.layer.Layer):
     def start_hand(self):
         for i in range(7):
             a = self._pool.sort_peca()
-            self._hand.insert(a)
             if a.get_value()[0] == a.get_value()[1] and a.get_value()[0] == 6:
                 self._isPlayer = True
+                self._domino.add(a)
+            else:
+                self._hand.insert(a)
 
     # Funcao para inserir o sprite da peca a direita
     def place_at_right(self):
@@ -300,19 +309,32 @@ class Main(cocos.layer.Layer):
     def start_bots_hand(self):
         for i in range(7):
             a = self._pool.sort_peca()
-            self._bot1.insert(a)
             if a.get_value()[0] == a.get_value()[1] and a.get_value()[0] == 6:
-                self._isBot1 = True
+                peca = a
+                peca.sprite().rotation = 0
+                peca.sprite().position = (1280 // 2), (720 // 2)
+                self._domino.insert(peca, 1)
+            else:
+                self._bot1.insert(a)
+
         for i in range(7):
             b = self._pool.sort_peca()
-            self._bot2.insert(b)
             if b.get_value()[0] == b.get_value()[1] and b.get_value()[0] == 6:
-                self._isBot2 = True
+                peca = b
+                peca.sprite().rotation = 0
+                peca.sprite().position = (1280 // 2), (720 // 2)
+                self._domino.insert(peca, 1)
+            else:
+                self._bot2.insert(b)
         for i in range(7):
             c = self._pool.sort_peca()
-            self._bot3.insert(c)
             if c.get_value()[0] == c.get_value()[1] and c.get_value()[0] == 6:
-                self._isBot3 = True
+                peca = c
+                peca.sprite().rotation = 0
+                peca.sprite().position = (1280 // 2), (720 // 2)
+                self._domino.insert(peca, 1)
+            else:
+                self._bot3.insert(c)
 
         self.bot_time()
 
@@ -345,7 +367,7 @@ class Main(cocos.layer.Layer):
                     p = self._bot1.search(i)
                     if p.get_value()[0] == p.get_value()[1] and p.get_value()[0] == 6:
                         print("Comecando a mao bot1" + " " + self._bot1.show())
-                        self.throw_bot(1, i, 0)
+                        #self.throw_bot(1, i, 0)
                         self._isBot1 = False
                         self._isBot2 = True
                         break
@@ -387,7 +409,7 @@ class Main(cocos.layer.Layer):
                     p = self._bot2.search(i)
                     if p.get_value()[0] == p.get_value()[1] and p.get_value()[0] == 6:
                         print("Comecando a mao bot2" + " " + self._bot2.show())
-                        self.throw_bot(2, i, 0)
+                        #self.throw_bot(2, i, 0)
                         self._isBot2 = False
                         self._isBot3 = True
                         break
@@ -430,7 +452,6 @@ class Main(cocos.layer.Layer):
                     p = self._bot3.search(i)
                     if p.get_value()[0] == p.get_value()[1] and p.get_value()[0] == 6:
                         print("Comecando a mao bot3" + " " + self._bot3.show())
-                        self.throw_bot(3, i, 0)
                         self._isBot3 = False
                         self._isPlayer = True
                         break
@@ -444,6 +465,8 @@ class Main(cocos.layer.Layer):
                 self._isBot1 = False
                 self._isBot2 = False
                 self._isBot3 = False
+        if (self._isBot1 == False and self._isBot2 == False and self._isBot3 == False):
+            self._isPlayer = True
 
         if self._bot1Passed and self._bot2Passed and self._bot3Passed and self._playerPassed and not self._isGameClosed:
             self._isGameClosed = True
@@ -461,29 +484,38 @@ class Main(cocos.layer.Layer):
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
-                        self.insert_sprites_in_position(peca, 90, 0)
+                        peca.sprite().rotation =  0
+                        peca.sprite().position = (1280 // 8) + self._posX, 720 - (720 // 8)
+                        self._posX += 45
                         self._domino.insert(peca, 0)
                     elif self._domino.head().get_value()[0] is peca.get_value()[1]:
-                        self.insert_sprites_in_position(peca, 180, 0)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posX, 720 - (720 // 8)
+                        self._posX += 45
                         self._domino.insert(peca, 0)
                 elif position == 1:
                     peca = self._bot1.remove(index)
                     peca.set_previous(None)
                     peca.set_next(None)
                     if self._domino.tail().get_value()[1] is peca.get_value()[0]:
-                        self.insert_sprites_in_position(peca, 90, 1)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posY, 720 - (720 // 4)
+                        self._posY += 45
                         self._domino.append(peca)
                     elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
-                        self.insert_sprites_in_position(peca, 180, 1)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posY, 720 - (720 // 4)
+                        self._posY += 45
                         self._domino.append(peca)
             else:
                 peca = self._bot1.remove(index)
                 peca.set_previous(None)
                 peca.set_next(None)
-                self.insert_sprites_in_position(peca, 0, 0)
+                peca.sprite().rotation = 0
+                peca.sprite().position = (1280 // 2), (720 // 2)
                 self._domino.insert(peca, 1)
         elif bot == 2:
             if self._domino.len() != 0:
@@ -495,29 +527,38 @@ class Main(cocos.layer.Layer):
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
-                        self.insert_sprites_in_position(peca, 90, 0)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posX, 720 - (720 // 8)
+                        self._posX += 45
                         self._domino.insert(peca, 0)
                     elif self._domino.head().get_value()[0] is peca.get_value()[1]:
-                        self.insert_sprites_in_position(peca, 90, 0)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posX, 720 - (720 // 8)
+                        self._posX += 45
                         self._domino.insert(peca, 0)
                 elif position == 1:
                     peca = self._bot2.remove(index)
                     peca.set_previous(None)
                     peca.set_next(None)
                     if self._domino.tail().get_value()[1] is peca.get_value()[0]:
-                        self.insert_sprites_in_position(peca, 90, 1)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posY, 720 - (720 // 4)
+                        self._posY += 45
                         self._domino.append(peca)
                     elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
-                        self.insert_sprites_in_position(peca, 90, 1)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posY, 720 - (720 // 4)
+                        self._posY += 45
                         self._domino.append(peca)
             else:
                 peca = self._bot2.remove(index)
                 peca.set_previous(None)
                 peca.set_next(None)
-                self.insert_sprites_in_position(peca, 90, 0)
+                peca.sprite().rotation = 0
+                peca.sprite().position = (1280 // 2),(720 // 2)
                 self._domino.insert(peca, 1)
         elif bot == 3:
             if self._domino.len() != 0:
@@ -529,29 +570,38 @@ class Main(cocos.layer.Layer):
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
-                        self.insert_sprites_in_position(peca, 180, 0)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posX, 720 - (720 // 8)
+                        self._posX += 45
                         self._domino.insert(peca, 0)
                     elif self._domino.head().get_value()[0] is peca.get_value()[1]:
-                        self.insert_sprites_in_position(peca, 0, 0)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posX, 720 - (720 // 8)
+                        self._posX += 45
                         self._domino.insert(peca, 0)
                 elif position == 1:
                     peca = self._bot3.remove(index)
                     peca.set_previous(None)
                     peca.set_next(None)
                     if self._domino.tail().get_value()[1] is peca.get_value()[0]:
-                        self.insert_sprites_in_position(peca, 90, 1)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posY, 720 - (720 // 4)
+                        self._posY += 45
                         self._domino.append(peca)
                     elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
-                        self.insert_sprites_in_position(peca, 180, 1)
+                        peca.sprite().rotation = 0
+                        peca.sprite().position = (1280 // 8) + self._posY, 720 - (720 // 4)
+                        self._posY += 45
                         self._domino.append(peca)
             else:
                 peca = self._bot3.remove(index)
                 peca.set_previous(None)
                 peca.set_next(None)
-                self.insert_sprites_in_position(peca, 90, 0)
+                peca.sprite().rotation = 0
+                peca.sprite().position = (1280 // 2), (720 // 2)
                 self._domino.insert(peca, 1)
         else:
             raise Exception("Exception, no bot found")
@@ -613,7 +663,7 @@ class Main(cocos.layer.Layer):
     # Funcao que carrega as imagens das pecas dos bots na tela
     def load_parts_on_screen(self):
         array_sprite_bot1 = self._bot1.hand_sprites()
-        self.get_sprites(array_sprite_bot1, 0, -125, 50, "y")
+        self.get_sprites(array_sprite_bot1, 150, -125, 50, "y")
         array_sprite_bot2 = self._bot2.hand_sprites()
         self.get_sprites(array_sprite_bot2, -150, 720, 50, "x")
         array_sprite_bot3 = self._bot3.hand_sprites()
@@ -623,6 +673,7 @@ class Main(cocos.layer.Layer):
         if orientation == 'x':
             for i in range(len(array)):
                 sprite = array[i]
+                sprite.anchor = sprite.get_rect().bottomleft
                 sprite.position = (1280 // 2) + pos_x, pos_y
                 sprite.scale = 0.45
                 self.add(sprite)
@@ -630,6 +681,7 @@ class Main(cocos.layer.Layer):
         else:
             for i in range(len(array)):
                 sprite = array[i]
+                sprite.anchor = sprite.get_rect().bottomleft
                 sprite.rotation = -90
                 sprite.position = pos_x, (720 // 2) + pos_y
                 sprite.scale = 0.45
@@ -637,18 +689,3 @@ class Main(cocos.layer.Layer):
                 pos_y += space
 
         return pos_x
-
-    def insert_sprites_in_position(self, peca, rotation, side):
-        if side == 0:
-            self._d_sprites.insert(0, peca.sprite())
-            #peca.sprite().rotation = rotation
-            #peca.sprite().position = self._d_sprites[0].x + (83 // 2), 720 // 2
-            peca.position = (1280 // 8) + self._posY, 720 - (720 // 4)
-            self._posY += 45
-        elif side == 1:
-            self._d_sprites.append(peca)
-            peca.position = (1280 // 8) + self._posY, 720 - (720 // 4)
-            self._posY += 45
-
-            #peca.sprite().rotation = rotation
-            #peca.sprite().position = self._d_sprites[0].x + (83 // 2), 720 // 2
