@@ -6,7 +6,8 @@ from pool_struct import *
 from hand_struct import *
 from domino_struct import *
 
-#Class que define a imagem de fundo
+
+# Class que define a imagem de fundo
 class Background(cocos.layer.Layer):
     def __init__(self):
         super(Background, self).__init__()
@@ -15,7 +16,8 @@ class Background(cocos.layer.Layer):
         background.position = 1280 // 2, 720 // 2
         self.add(background)
 
-#Funcao que verifica se o botao de passar foi clicado
+
+# Funcao que verifica se o botao de passar foi clicado
 def pass_button(x, y):
     if 1100 <= x <= 1200:
         if 25 <= y <= 55:
@@ -24,7 +26,8 @@ def pass_button(x, y):
     else:
         return False
 
-#Class para definir as funcoes do jogo
+
+# Class para definir as funcoes do jogo
 class Main(cocos.layer.Layer):
     is_event_handler = True
 
@@ -47,6 +50,7 @@ class Main(cocos.layer.Layer):
         self._playerPassed = False
         self.start_hand()
         self.start_bots_hand()
+        self.load_parts_on_screen()
         self._h_sprites = self._hand.hand_sprites()
         self._d_sprites = []
         self._pieceIndex = None
@@ -55,28 +59,29 @@ class Main(cocos.layer.Layer):
         self._indiceHead = 0
         self._indiceTail = 1
         self.set_sprites()
+        self._posX = 0
+        self._posY = 0
         self._label = cocos.text.Label("",
                                        font_name='Times New Roman',
                                        font_size=32,
                                        anchor_x='center',
-                                       anchor_y='center') #Exibe Texto na tela
+                                       anchor_y='center')  # Exibe Texto na tela
 
         layer = cocos.layer.ColorLayer(24, 24, 255, 50, width=100, height=30)
         layer.position = (1100, 25)
         layerText = cocos.text.Label("PASS",
-                                       font_name='Times New Roman',
-                                       font_size=20,
-                                       anchor_x='center',
-                                       anchor_y='center')
-        layerText.position = (100//2, 30//2)
+                                     font_name='Times New Roman',
+                                     font_size=20,
+                                     anchor_x='center',
+                                     anchor_y='center')
+        layerText.position = (100 // 2, 30 // 2)
         layer.add(layerText)
-        #Da linha 64 a 72 cria o label para passar a vez
-        self.add(layer) #Adiciona o botao no layer principal
-        self._label.position = 1280 // 2, 720 - (720 // 8)#Define a posicao do texto
+        # Da linha 64 a 72 cria o label para passar a vez
+        self.add(layer)  # Adiciona o botao no layer principal
+        self._label.position = 1280 // 2, 720 - (720 // 8)  # Define a posicao do texto
         self.add(self._label)
-        self.load_parts_on_screen()
 
-    #Exibe na tela as pecas da mao do player
+    # Exibe na tela as pecas da mao do player
     def set_sprites(self):
         pos_x = -125
         for i in range(7):
@@ -87,11 +92,12 @@ class Main(cocos.layer.Layer):
             self.add(sprite)
             pos_x += 50
 
-    #Funcao para checar se o mouse esta sendo clicado e arrastado
+    # Funcao para checar se o mouse esta sendo clicado e arrastado
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if self._isPieceSelected:
             self._h_sprites[self._pieceIndex].position = x + 31, y + 51
-    #Funcao para checar se o botao do mouse foi soltado
+
+    # Funcao para checar se o botao do mouse foi soltado
     def on_mouse_release(self, x, y, buttons, modifiers):
         self._isPieceSelected = False
         try:
@@ -123,7 +129,8 @@ class Main(cocos.layer.Layer):
                 pass
         except:
             pass
-    #Funcao para checar se o botao do mouse foi pressionado
+
+    # Funcao para checar se o botao do mouse foi pressionado
     def on_mouse_press(self, x, y, buttons, modifiers):
         if self._isPlayer:
             if self.check_click(x, y):
@@ -149,7 +156,7 @@ class Main(cocos.layer.Layer):
         print("Bot 1 Passou - " + str(self._bot1Passed), "\n" + "Bot 2 Passou - " + str(self._bot2Passed),
               "\n" + "Bot 3 Passou - " + str(self._bot3Passed))
 
-    #Funcao que faz a verificacao de cliques (Se esta clicando na peca ou no layer)
+    # Funcao que faz a verificacao de cliques (Se esta clicando na peca ou no layer)
     def check_click(self, x, y):
         check = False
         pos = 0
@@ -161,21 +168,21 @@ class Main(cocos.layer.Layer):
                 pos += 1
         return check
 
-    #Funcao que verifica se a peca selecionada e compativel com a cabeca do domino
+    # Funcao que verifica se a peca selecionada e compativel com a cabeca do domino
     def check_head(self):
         if self._domino.head().get_value()[self._indiceHead] in self._hand.search(self._pieceIndex).get_value():
             self.place_at_left()
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
 
-    #Funcao que verifica se a peca selecionada e compativel com o tail do domino
+    # Funcao que verifica se a peca selecionada e compativel com o tail do domino
     def check_tail(self):
         if self._domino.tail().get_value()[self._indiceTail] in self._hand.search(self._pieceIndex).get_value():
             self.place_at_right()
         else:
             self._h_sprites[self._pieceIndex].position = self._lastPosition
 
-    #Funcao que verifica se a peca selecionada e a maior da mao
+    # Funcao que verifica se a peca selecionada e a maior da mao
     def check_highest_piece(self):
         highest = 0
         aux = -1
@@ -193,11 +200,11 @@ class Main(cocos.layer.Layer):
                 aux += 1
         return pos
 
-    #Funcao que verifica se a peca selecionada e uma bomba
+    # Funcao que verifica se a peca selecionada e uma bomba
     def is_bomb(self):
         return self._hand.search(self._pieceIndex).get_value()[0] == self._hand.search(self._pieceIndex).get_value()[1]
 
-    #Funcao que inicia a mao do jogador (chamada no __init__)
+    # Funcao que inicia a mao do jogador (chamada no __init__)
     def start_hand(self):
         for i in range(7):
             a = self._pool.sort_peca()
@@ -205,19 +212,19 @@ class Main(cocos.layer.Layer):
             if a.get_value()[0] == a.get_value()[1] and a.get_value()[0] == 6:
                 self._isPlayer = True
 
-    #Funcao para inserir o sprite da peca a direita
+    # Funcao para inserir o sprite da peca a direita
     def place_at_right(self):
         a = self._h_sprites.pop(self._pieceIndex)
         self._d_sprites.append(a)
         self.throw_right(a)
 
-    #Funcao para inserir o sprite da peca a esquerda
+    # Funcao para inserir o sprite da peca a esquerda
     def place_at_left(self):
         a = self._h_sprites.pop(self._pieceIndex)
         self._d_sprites.insert(0, a)
         self.throw_left(a)
 
-    #Funcao para inserir a peca no struct do domino e posicionar os sprites a esquerda
+    # Funcao para inserir a peca no struct do domino e posicionar os sprites a esquerda
     def throw_left(self, a):
         peca = self._hand.remove(self._pieceIndex)
         peca.set_previous(None)
@@ -227,15 +234,16 @@ class Main(cocos.layer.Layer):
             peca.get_value()[1] = peca.get_value()[0]
             peca.get_value()[0] = temp
             self._domino.insert(peca, 0)
-            a.rotation = 90
-            print(a.get_rect())
-            a.position = self._d_sprites[0].x - (83 // 2) + 2, 720 // 2
+            a.rotation = 0
+            a.position = (1280//8) + self._posX, 720 - (720 // 8)
+            self._posX += 45
         elif self._domino.head().get_value()[0] is peca.get_value()[1]:
             self._domino.insert(peca, 0)
-            a.rotation = -90
+            a.rotation = 0
             print("de baixo: {}".format((83 // 3)))
             print(a.get_rect())
-            a.position = self._d_sprites[0].x + 83 // 2, (720 // 2) - 42
+            a.position = (1280//8) + self._posX, 720 - (720 // 8)
+            self._posX += 45
 
         self._isPlayer = False
         self._playerPassed = False
@@ -243,29 +251,34 @@ class Main(cocos.layer.Layer):
         self.bot_time()
         self.player_winner()
 
-    #Funcao para inserir a peca no struct do domino e posicionar os sprites a direita
+    # Funcao para inserir a peca no struct do domino e posicionar os sprites a direita
     def throw_right(self, a):
         peca = self._hand.remove(self._pieceIndex)
         peca.set_previous(None)
         peca.set_next(None)
         if self._domino.tail().get_value()[1] is peca.get_value()[0]:
             self._domino.append(peca)
-            a.rotation = -90
+            a.rotation = 0
             if len(self._d_sprites) > 1:
-                a.position = self._d_sprites[1].x + 83 // 2, (720 // 2) - 42
+                a.position = (1280//8) + self._posY, 720 - (720 // 4)
+                self._posY += 45
             else:
-                a.position = self._d_sprites[0].x + 83 // 2, (720 // 2) - 42
+                a.position = (1280//8) + self._posY, 720 - (720 // 4)
+                self._posY += 45
 
         elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
             temp = peca.get_value()[1]
             peca.get_value()[1] = peca.get_value()[0]
             peca.get_value()[0] = temp
             self._domino.append(peca)
-            a.rotation = 90
+            a.rotation = 0
             if len(self._d_sprites) > 1:
-                a.position = self._d_sprites[1].x + (83 // 2) + 2, 720 // 2
+                a.position = (1280//8) + self._posY, 720 - (720 // 4)
+                self._posY += 45
+
             else:
-                a.position = self._d_sprites[0].x + (83 // 2) + 2, 720 // 2
+                a.position = (1280//8) + self._posY, 720 - (720 // 4)
+                self._posY += 45
 
         self._isPlayer = False
         self._playerPassed = False
@@ -273,7 +286,7 @@ class Main(cocos.layer.Layer):
         self.bot_time()
         self.player_winner()
 
-    #Funcao para jogar peca no jogo, chamada quando o player possui a maior peca do jogo
+    # Funcao para jogar peca no jogo, chamada quando o player possui a maior peca do jogo
     def throw(self):
         peca = self._hand.remove(self._pieceIndex)
         peca.set_previous(None)
@@ -283,7 +296,7 @@ class Main(cocos.layer.Layer):
         self._isBot1 = True
         self.bot_time()
 
-    #Funcao que inicia a mao dos bots
+    # Funcao que inicia a mao dos bots
     def start_bots_hand(self):
         for i in range(7):
             a = self._pool.sort_peca()
@@ -303,7 +316,7 @@ class Main(cocos.layer.Layer):
 
         self.bot_time()
 
-    #Funcao que coordena a vez dos bots assim como verifica se ele possui a peca a ser jogada
+    # Funcao que coordena a vez dos bots assim como verifica se ele possui a peca a ser jogada
     def bot_time(self):
         if self._isBot1:
             if self._domino.len() != 0:
@@ -436,7 +449,7 @@ class Main(cocos.layer.Layer):
             self._isGameClosed = True
             self.count()
 
-    #Funcao de bot que joga a peca selecionada no domino
+    # Funcao de bot que joga a peca selecionada no domino
     def throw_bot(self, bot, index, position):
         if bot == 1:
             if self._domino.len() != 0:
@@ -448,24 +461,29 @@ class Main(cocos.layer.Layer):
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
+                        self.insert_sprites_in_position(peca, 90, 0)
                         self._domino.insert(peca, 0)
                     elif self._domino.head().get_value()[0] is peca.get_value()[1]:
+                        self.insert_sprites_in_position(peca, 180, 0)
                         self._domino.insert(peca, 0)
                 elif position == 1:
                     peca = self._bot1.remove(index)
                     peca.set_previous(None)
                     peca.set_next(None)
                     if self._domino.tail().get_value()[1] is peca.get_value()[0]:
+                        self.insert_sprites_in_position(peca, 90, 1)
                         self._domino.append(peca)
                     elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
+                        self.insert_sprites_in_position(peca, 180, 1)
                         self._domino.append(peca)
             else:
                 peca = self._bot1.remove(index)
                 peca.set_previous(None)
                 peca.set_next(None)
+                self.insert_sprites_in_position(peca, 0, 0)
                 self._domino.insert(peca, 1)
         elif bot == 2:
             if self._domino.len() != 0:
@@ -477,24 +495,29 @@ class Main(cocos.layer.Layer):
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
+                        self.insert_sprites_in_position(peca, 90, 0)
                         self._domino.insert(peca, 0)
                     elif self._domino.head().get_value()[0] is peca.get_value()[1]:
+                        self.insert_sprites_in_position(peca, 90, 0)
                         self._domino.insert(peca, 0)
                 elif position == 1:
                     peca = self._bot2.remove(index)
                     peca.set_previous(None)
                     peca.set_next(None)
                     if self._domino.tail().get_value()[1] is peca.get_value()[0]:
+                        self.insert_sprites_in_position(peca, 90, 1)
                         self._domino.append(peca)
                     elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
+                        self.insert_sprites_in_position(peca, 90, 1)
                         self._domino.append(peca)
             else:
                 peca = self._bot2.remove(index)
                 peca.set_previous(None)
                 peca.set_next(None)
+                self.insert_sprites_in_position(peca, 90, 0)
                 self._domino.insert(peca, 1)
         elif bot == 3:
             if self._domino.len() != 0:
@@ -506,29 +529,34 @@ class Main(cocos.layer.Layer):
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
+                        self.insert_sprites_in_position(peca, 180, 0)
                         self._domino.insert(peca, 0)
                     elif self._domino.head().get_value()[0] is peca.get_value()[1]:
+                        self.insert_sprites_in_position(peca, 0, 0)
                         self._domino.insert(peca, 0)
                 elif position == 1:
                     peca = self._bot3.remove(index)
                     peca.set_previous(None)
                     peca.set_next(None)
                     if self._domino.tail().get_value()[1] is peca.get_value()[0]:
+                        self.insert_sprites_in_position(peca, 90, 1)
                         self._domino.append(peca)
                     elif self._domino.tail().get_value()[1] is peca.get_value()[1]:
                         temp = peca.get_value()[1]
                         peca.get_value()[1] = peca.get_value()[0]
                         peca.get_value()[0] = temp
+                        self.insert_sprites_in_position(peca, 180, 1)
                         self._domino.append(peca)
             else:
                 peca = self._bot3.remove(index)
                 peca.set_previous(None)
                 peca.set_next(None)
+                self.insert_sprites_in_position(peca, 90, 0)
                 self._domino.insert(peca, 1)
         else:
             raise Exception("Exception, no bot found")
 
-    #Funcao que verifica quem tem a menor contagem de pontos (Chamada quando todos passam a vez)
+    # Funcao que verifica quem tem a menor contagem de pontos (Chamada quando todos passam a vez)
     def count(self):
         winner = ""
         score = 0
@@ -573,7 +601,7 @@ class Main(cocos.layer.Layer):
         self._isBot2 = False
         self._isBot3 = False
 
-    #Funcao que diz que o player venceu
+    # Funcao que diz que o player venceu
     def player_winner(self):
         if self._hand.len() == 0:
             self._label.element.text = "Voce Venceu, Parabens"
@@ -582,7 +610,7 @@ class Main(cocos.layer.Layer):
             self._isBot2 = False
             self._isBot3 = False
 
-    #Funcao que carrega as imagens das pecas dos bots na tela
+    # Funcao que carrega as imagens das pecas dos bots na tela
     def load_parts_on_screen(self):
         array_sprite_bot1 = self._bot1.hand_sprites()
         self.get_sprites(array_sprite_bot1, 0, -125, 50, "y")
@@ -609,3 +637,18 @@ class Main(cocos.layer.Layer):
                 pos_y += space
 
         return pos_x
+
+    def insert_sprites_in_position(self, peca, rotation, side):
+        if side == 0:
+            self._d_sprites.insert(0, peca.sprite())
+            #peca.sprite().rotation = rotation
+            #peca.sprite().position = self._d_sprites[0].x + (83 // 2), 720 // 2
+            peca.position = (1280 // 8) + self._posY, 720 - (720 // 4)
+            self._posY += 45
+        elif side == 1:
+            self._d_sprites.append(peca)
+            peca.position = (1280 // 8) + self._posY, 720 - (720 // 4)
+            self._posY += 45
+
+            #peca.sprite().rotation = rotation
+            #peca.sprite().position = self._d_sprites[0].x + (83 // 2), 720 // 2
